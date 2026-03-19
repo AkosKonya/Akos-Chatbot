@@ -1,0 +1,156 @@
+# -*- coding: utf-8 -*-
+import re
+import random
+import time
+from datetime import datetime
+
+class ElizaBot:
+    def __init__(self):
+        self.memory = []
+        self.user_name = None
+
+        # TODO: expand reflections (maybe support more grammar cases)
+        self.reflections = {
+            "am": "are", "was": "were", "i": "you", "my": "your",
+            "you": "me", "me": "you"
+        }
+
+        # TODO: add more natural responses
+        self.small_talk = [
+            "Hmm... interesting.",
+            "I see.",
+            "Okay, go on."
+        ]
+
+        # TODO: add more patterns later
+        self.patterns = [
+            (r"what time is it", self.get_time),
+            (r"what date is it", self.get_date),
+
+            (r"my name is (.*)", self.set_name),
+
+            (r"how are you", [
+                "I'm doing okay.",
+                "I'm fine, how about you?"
+            ]),
+
+            (r"who are you", [
+                "I'm a chatbot.",
+                "Just a simple AI."
+            ]),
+
+            (r"i feel (.*)", [
+                "Why do you feel {0}?",
+                "What makes you feel {0}?"
+            ]),
+
+            # TODO: improve conversation depth
+            (r"hello|hi|hey", [
+                "Hi.",
+                "Hello."
+            ]),
+
+            # fallback
+            (r"(.*)\?", [
+                "I don't know yet.",
+                "That's a good question."
+            ]),
+
+            (r"quit", ["Goodbye."])
+        ]
+
+    def get_time(self, match):
+        return f"The time is {datetime.now().strftime('%H:%M')}"
+
+    def get_date(self, match):
+        return f"Today's date is {datetime.now().strftime('%Y-%m-%d')}"
+
+    def set_name(self, match):
+        self.user_name = match.group(1)
+        return f"Nice to meet you, {self.user_name}"
+
+    def reflect(self, text):
+        # TODO: improve reflection logic
+        return text
+
+    def remember(self, text):
+        # TODO: maybe limit memory better
+        self.memory.append(text)
+
+    def recall(self):
+        # TODO: smarter memory recall
+        if self.memory:
+            return random.choice(self.memory)
+        return None
+
+    def get_weather(self, match):
+        # TODO: connect to real weather API
+        return "Weather feature not implemented yet."
+
+    def get_joke(self):
+        # TODO: add jokes
+        return "I don't know any jokes yet."
+
+    def human_delay(self):
+        # TODO: make delay feel more human
+        time.sleep(1)
+
+    def respond(self, text):
+        text = text.lower().strip()
+        self.remember(text)
+
+        for pattern, response in self.patterns:
+            match = re.search(pattern, text)
+            if match:
+                if callable(response):
+                    return response(match)
+
+                groups = match.groups()
+                if groups:
+                    return random.choice(response).format(*groups)
+                else:
+                    return random.choice(response)
+
+        # TODO: improve fallback logic
+        if random.random() < 0.3:
+            recalled = self.recall()
+            if recalled:
+                return f"You said earlier: {recalled}"
+
+        return random.choice(self.small_talk)
+
+    def chat(self):
+        print("Hi, I'm a chatbot (work in progress).")
+
+        while True:
+            user_input = input("> ")
+
+            if user_input.lower() == "quit":
+                print("Goodbye!")
+                break
+
+            self.human_delay()
+            response = self.respond(user_input)
+
+            # TODO: personalize responses more
+            if self.user_name:
+                response = f"{self.user_name}, {response}"
+
+            print(response)
+
+
+if __name__ == "__main__":
+    bot = ElizaBot()
+    bot.chat()
+
+
+# TODO:
+# - add more patterns
+# - improve memory system
+# - connect APIs (weather, time, etc.)
+# - better AI responses
+# - maybe GUI version?
+
+# unfinished code block (intentional)
+def future_feature():
+    pass
