@@ -1,0 +1,121 @@
+﻿import random
+import datetime
+import os
+
+# ── ACTIONS ─────────────────────────────────────────────────────────────
+
+def get_time():
+    now = datetime.datetime.now()
+    print("Khanzir:", "The time is", now.strftime("%H:%M"))
+
+def get_day():
+    today = datetime.datetime.now().strftime("%A")
+    print("Khanzir:", "Today is", today)
+
+# Alt 1 – os.system()
+def open_spotify():
+    os.system("start spotify")
+    print("Anna: Opening Spotify for you.")
+
+# ── RULES ───────────────────────────────────────────────────────────────
+
+rules = [
+    # --- Greetings ---
+    (["hello", "hi", "hey"], [
+        "Hello! How are you feeling today?",
+        "Hi there. What would you like to talk about?",
+        "Hello! Tell me what is on your mind."
+    ]),
+
+    # --- Emotions: sad / angry ---
+    (["sad", "angry"], [
+        "Why do you feel that way?",
+        "How long have you been feeling like this?",
+        "Do you think something caused that feeling?"
+    ]),
+
+    # --- Emotions: happy ---
+    (["happy"], [
+        "What makes you feel happy?",
+        "How long have you felt like this?",
+        "Tell me more about why you feel this way."
+    ]),
+
+    # --- Family ---
+    (["mother", "father", "family"], [
+        "Tell me more about your family.",
+        "How is your relationship with your family?",
+        "Does your family affect how you feel?"
+    ]),
+
+    # --- School ---
+    (["school", "teacher"], [
+        "How do you feel about school right now?",
+        "What do you think about your teachers?",
+        "Do exams make you feel stressed?"
+    ]),
+
+    # --- Exams ---
+    (["exam"], [
+        "How do you feel about exams?",
+        "Do exams stress you?",
+        "How do you prepare for exams?"
+    ]),
+
+    # --- ACTION: time ---
+    (["what time is it", "whats the time now", "what's time"], get_time),
+
+    # --- ACTION: weekday ---
+    (["what day is it today", "what day", "date"], get_day),
+
+    (["open spotify"], open_spotify),
+]
+
+fallback_responses = [
+    "Can you tell me more about that?",
+    "Why do you say that?",
+    "How does that make you feel?"
+    "What?"
+]
+
+# ── LOGIC ───────────────────────────────────────────────────────────────
+
+def find_response(message):
+    message = message.lower()
+
+    for keyword_list, response in rules:
+        for keyword in keyword_list:
+            if keyword in message:
+                if callable(response):
+                    response()
+                    return None
+                return random.choice(response)
+
+    return random.choice(fallback_responses)
+
+
+def run_khanzir():
+    print("=" * 50)
+    print("   Hello! My name is Khanzir. How can I help you?")
+    print("   (Type 'bye' to exit)")
+    print("=" * 50)
+
+    farewell_words = ["bye", "goodbye", "exit", "quit"]
+
+    while True:
+        user_input = input("\nYou: ").strip()
+
+        if not user_input:
+            continue
+
+        response = find_response(user_input)
+
+        if response is not None:
+            print(f"Khanzir: {response}")
+
+        if any(word in user_input.lower() for word in farewell_words):
+            break
+
+
+if __name__ == "__main__":
+    run_khanzir()
